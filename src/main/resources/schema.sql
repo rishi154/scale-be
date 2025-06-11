@@ -120,3 +120,18 @@ CREATE TABLE IF NOT EXISTS ai_audit_logs (
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
+
+CREATE TABLE IF NOT EXISTS comment (
+    comment_id CHAR(36) PRIMARY KEY,
+    idea_id CHAR(36),
+    submitter_id CHAR(36),
+    comment_text TEXT,
+    type ENUM('PRAISE', 'SUGGESTION', 'CONCERN') DEFAULT 'SUGGESTION',
+    visibility ENUM('PUBLIC', 'PRIVATE') DEFAULT 'PUBLIC',
+    recognition_points INT DEFAULT 0,
+    badges_awarded JSON,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (idea_id) REFERENCES ideas(idea_id),
+    FOREIGN KEY (submitter_id) REFERENCES users(user_id)
+);
