@@ -74,7 +74,7 @@ public class WebSecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // Specify the allowed origins, e.g., your frontend application's URL
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3002", "https://your-frontend-domain.com","*.*"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://your-frontend-domain.com","*.*"));
         // Specify the allowed HTTP methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         // Specify the allowed headers
