@@ -29,6 +29,11 @@ public class FeedbackController {
         return new ResponseEntity<>(feedbackService.createFeedback(request, submitterId), HttpStatus.CREATED);
     }
 
+    @PostMapping("/ideas/{ideaId}")
+    public ResponseEntity<FeedbackDto> createFeedbackForIdea(@PathVariable String ideaId, @Valid @RequestBody CreateFeedbackRequest request,
+                                                      @RequestParam String submitterId) {
+        return new ResponseEntity<>(feedbackService.createFeedback(request, submitterId), HttpStatus.CREATED);
+    }
     @GetMapping("/{feedbackId}")
     public ResponseEntity<FeedbackDto> getFeedbackById(@PathVariable String feedbackId) {
         return ResponseEntity.ok(feedbackService.getFeedbackById(feedbackId));
