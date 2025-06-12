@@ -18,7 +18,6 @@ public class CommentDaoImpl implements CommentDao {
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-
     public CommentDaoImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }

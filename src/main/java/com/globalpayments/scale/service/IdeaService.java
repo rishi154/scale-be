@@ -2,18 +2,23 @@ package com.globalpayments.scale.service;
 
 import com.globalpayments.scale.dao.AiAuditLogDao;
 import com.globalpayments.scale.dao.IdeaDao;
+import com.globalpayments.scale.dao.IdeaViewsDao;
 import com.globalpayments.scale.dao.UserDao;
 import com.globalpayments.scale.dto.CreateIdeaRequest;
 import com.globalpayments.scale.dto.IdeaDto;
 import com.globalpayments.scale.exception.ResourceNotFoundException;
 import com.globalpayments.scale.model.AiAuditLog;
 import com.globalpayments.scale.model.Idea;
+import com.globalpayments.scale.model.IdeaView;
 import com.globalpayments.scale.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,12 +27,14 @@ public class IdeaService {
     private final IdeaDao ideaDao;
     private final UserDao userDao;
     private final AiAuditLogDao aiAuditLogDao;
+    private final IdeaViewsDao ideaViewsDao;
 
     @Autowired
-    public IdeaService(IdeaDao ideaDao, UserDao userDao, AiAuditLogDao aiAuditLogDao) {
+    public IdeaService(IdeaDao ideaDao, UserDao userDao, AiAuditLogDao aiAuditLogDao, IdeaViewsDao ideaViewsDao) {
         this.ideaDao = ideaDao;
         this.userDao = userDao;
         this.aiAuditLogDao = aiAuditLogDao;
+        this.ideaViewsDao = ideaViewsDao;
     }
 
     public IdeaDto createIdea(CreateIdeaRequest request, String submitterId) {
@@ -73,6 +80,26 @@ public class IdeaService {
     public IdeaDto getIdeaById(String ideaId) {
         Idea idea = ideaDao.findById(ideaId)
                 .orElseThrow(() -> new ResourceNotFoundException("Idea not found with ID: " + ideaId));
+
+        Optional<IdeaView> byIdeaId = ideaViewsDao.findByIdeaId(ideaId);
+
+        System.out.println("Found idea view: " + byIdeaId.isPresent());
+//        System.out.println("Found idea view to string: " + byIdeaId.get().toString());
+        System.out.println(userDao.toString());
+        System.out.println(idea.toString());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println(authentication);
+        System.out.println(authentication.getPrincipal());
+
+//        ideaViewsDao.findByUserIdAndIdeaId(ideaId, )
+//        if (!byIdeaId.isPresent()) {
+//            ideaDao.incrementViewCount(ideaId);
+//            IdeaView ideaView = new IdeaView();
+//            ideaView.setIdeaId(ideaId);
+//
+////            ideaView.setUserId();
+//
+//        }
 
         // Increment view count when getting an idea
         ideaDao.incrementViewCount(ideaId);

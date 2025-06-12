@@ -135,3 +135,12 @@ CREATE TABLE IF NOT EXISTS comment (
     FOREIGN KEY (idea_id) REFERENCES ideas(idea_id),
     FOREIGN KEY (submitter_id) REFERENCES users(user_id)
 );
+
+CREATE TABLE IF NOT EXISTS idea_views (
+    idea_views_id CHAR(36) PRIMARY KEY,
+    user_id CHAR(36) NOT NULL,
+    idea_id CHAR(36) NOT NULL,
+    viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (idea_id) REFERENCES ideas(idea_id)
+);

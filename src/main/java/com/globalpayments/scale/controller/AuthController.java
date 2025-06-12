@@ -56,6 +56,7 @@ public class AuthController {
 //
 //        SecurityContextHolder.getContext().setAuthentication(authentication);
         //String jwt = jwtProvider.generateToken(authentication);
+
         Optional<User> optionalUser = userDao.findByEmail(authRequest.getEmail());
         if (optionalUser.isEmpty()) {
             log.warn("Authentication failed: User not found for email {}", authRequest.getEmail());
@@ -85,6 +86,13 @@ public class AuthController {
         tempUserDTO.setCreatedAt(userDto.getCreatedAt());
         tempUserDTO.setUpdatedAt(userDto.getUpdatedAt());
         log.info("User {} authenticated successfully", userDto.getEmail());
+
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                user.getEmail(), null, null
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
         return ResponseEntity.ok(new AuthResponse(jwt, tempUserDTO));
     }
 
