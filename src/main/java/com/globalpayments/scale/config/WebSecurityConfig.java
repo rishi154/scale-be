@@ -1,9 +1,13 @@
 package com.globalpayments.scale.config;
 
+import com.globalpayments.scale.security.CustomAuthenticationManager;
 import com.globalpayments.scale.security.JwtAuthenticationFilter;
+import com.globalpayments.scale.security.PlainTextPasswordEncoder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -34,41 +38,52 @@ public class WebSecurityConfig {
 //    public WebSecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
 //        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
 //    }
+@Lazy
+@Autowired
+private CustomAuthenticationManager customAuthenticationManager;
+
+@Autowired
+private JwtAuthenticationFilter jwtAuthenticationFilter;
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
+        return customAuthenticationManager;
     }
 
     @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public PlainTextPasswordEncoder passwordEncoder() {
+        return new PlainTextPasswordEncoder();
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                .cors(Customizer.withDefaults()) // by default uses a Bean by the name of corsConfigurationSource
+                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .anyRequest().permitAll()
-                );
-                //.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                        .requestMatchers("/auth/login").permitAll()
+                        .anyRequest().authenticated()
+//                        .anyRequest().permitAll()
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
+        http.sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
     }
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails user = User
-                .withUsername("rishi154@gmail.com")
-                .password(passwordEncoder().encode("Password_123"))
-                .roles("ADMIN")
-                .build();
-
-        return new InMemoryUserDetailsManager(user);
-    }
+//    @Bean
+//    public UserDetailsService userDetailsService() {
+//        UserDetails user = User
+//                .withUsername("rishi154@gmail.com")
+//                .password(passwordEncoder().encode("Password_123"))
+//                .roles("ADMIN")
+//                .build();
+//
+//        return new InMemoryUserDetailsManager(user);
+//    }
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {

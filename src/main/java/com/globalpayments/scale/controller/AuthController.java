@@ -46,54 +46,16 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> authenticateUser(@Valid @RequestBody AuthRequest authRequest) {
-        log.debug("Inside ..............");
-//        Authentication authentication = authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(
-//                        authRequest.getEmail(),
-//                        authRequest.getPassword()
-//                )
-//        );
-//
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
-        //String jwt = jwtProvider.generateToken(authentication);
-
-        Optional<User> optionalUser = userDao.findByEmail(authRequest.getEmail());
-        if (optionalUser.isEmpty()) {
-            log.warn("Authentication failed: User not found for email {}", authRequest.getEmail());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        User user = optionalUser.get();
-        if (!user.getPassword().equals(authRequest.getPassword())) {
-            log.warn("Authentication failed: Incorrect password for email {}", authRequest.getEmail());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        UserDto userDto = userService.getUserByEmail(authRequest.getEmail());
-
-        String jwt = "Sdfdfldooidsuf98ewr984wt0dijgldskfpweuofdjl"; // Ideally generated via JWT utility
-
-        UserDto tempUserDTO = new UserDto();
-        tempUserDTO.setUserId(userDto.getUserId());
-        tempUserDTO.setName(userDto.getName());
-        tempUserDTO.setRole(userDto.getRole());
-        tempUserDTO.setEmail(userDto.getEmail());
-        tempUserDTO.setDepartment(userDto.getDepartment());
-        tempUserDTO.setLanguage(userDto.getLanguage());
-        tempUserDTO.setProfilePicture(userDto.getProfilePicture());
-        tempUserDTO.setAiAssistantEnabled(userDto.getAiAssistantEnabled());
-        tempUserDTO.setActive(userDto.getActive());
-        tempUserDTO.setCreatedAt(userDto.getCreatedAt());
-        tempUserDTO.setUpdatedAt(userDto.getUpdatedAt());
-        log.info("User {} authenticated successfully", userDto.getEmail());
-
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                user.getEmail(), null, null
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        authRequest.getEmail(),
+                        authRequest.getPassword()
+                )
         );
-
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-
-        return ResponseEntity.ok(new AuthResponse(jwt, tempUserDTO));
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtProvider.generateToken(authentication);
+        UserDto userDto = userService.getUserByEmail(authRequest.getEmail());
+        return ResponseEntity.ok(new AuthResponse(jwt, userDto));
     }
 
     @PostMapping("/register")
